@@ -9,7 +9,7 @@ import json
 from IPython import embed
 
 from DataLoader import VQADataLoader
-from model.net import XNMNet
+from model.net import NKM
 from utils.misc import todevice
 
 
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         }
         val_loader = VQADataLoader(**val_loader_kwargs)
         model_kwargs.update({'vocab': val_loader.vocab, 'device': device})
-        model = XNMNet(**model_kwargs).to(device)
+        model = NMK(**model_kwargs).to(device)
         model.load_state_dict(loaded['state_dict'])
         valid_acc = validate(model, val_loader, device)
         print('valid acc: %.4f' % valid_acc)
@@ -125,7 +125,7 @@ if __name__ == '__main__':
         }
         test_loader = VQADataLoader(**test_loader_kwargs)
         model_kwargs.update({'vocab': test_loader.vocab, 'device': device})
-        model = XNMNet(**model_kwargs).to(device)
+        model = NKM(**model_kwargs).to(device)
         model.load_state_dict(loaded['state_dict'])
         results = test(model, test_loader, device)
         questions = json.load(open(args.test_question_json))['questions']
