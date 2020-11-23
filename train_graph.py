@@ -8,12 +8,22 @@ import os
 
 from config import ModelConfig, BOX_SCALE, IM_SCALE
 from torch.nn import functional as F
-from lib.pytorch_misc import optimistic_restore, de_chunkize, clip_grad_norm
-from lib.evaluation.sg_eval import BasicSceneGraphEvaluator, calculate_mR_from_evaluator_list, eval_entry
-from lib.pytorch_misc import print_para
+from bridging.pytorch_misc import optimistic_restore, de_chunkize, clip_grad_norm
+from bridging.evaluation.sg_eval import BasicSceneGraphEvaluator, calculate_mR_from_evaluator_list, eval_entry
+from bridging.pytorch_misc import print_para
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-from lib.my_model_24 import KERN
+from bridging.my_model_24 import KERN
+
+
+conf = ModelConfig(f'''
+-m predcls -p 1000 -clip 5 
+-val_size 5000 
+-adam 
+-b 4
+-ngpu 1
+-lr 1e-4 
+''')
 
 train, val, _ = VG.splits(num_val_im=conf.val_size, filter_duplicate_rels=True,
                           use_proposals=conf.use_proposals,
@@ -86,6 +96,35 @@ else:
     detector.roi_fmap_obj[0].bias.data.copy_(ckpt['state_dict']['roi_fmap.0.bias'])
     detector.roi_fmap_obj[3].bias.data.copy_(ckpt['state_dict']['roi_fmap.3.bias'])
 
+
+
+def train_epoch(epoch_num):
+    detector.train()
+    tr = []
+    start = time.time()
+    for b, batch in enumerate(train_loader):
+        result, loss_pd = train_batch(batch, verbose=b % (conf.print_interval*10) == 0)
+        tr.append(loss_pd)
+        '''
+        if b % 100 == 0:
+            print(loss_pd)
+            gt = result.rel_labels[:,3].data.cpu().numpy()
+            out = result.rel_dists.data.cpu().numpy()
+            ind = np.where(gt)[0]
+            print(gt[ind])
+            print(np.argmax(out[ind], 1))
+            print(np.argmax(out[ind, 1:], 1) + 1)
+        '''
+
+        if b % conf.print_interval == 0 and b >= conf.print_interval:
+            mn = pd.concat(tr[-conf.print_interval:], axis=1).mean(1)
+            time_per_batch = (time.time() - start) / conf.print_interval
+            print("\ne{:2d}b{:5d}/{:5d} {:.3f}s/batch, {:.1f}m/epoch".format(
+                epoch_num, b, len(train_loader), time_per_batch, len(train_loader) * time_per_batch / 60))
+            print(mn)
+            print('-----------', flush=True)
+            start = time.time()
+    return pd.concat(tr, axis=1)
 
 def train_batch(b, verbose=False):
     """
