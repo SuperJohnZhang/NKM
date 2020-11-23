@@ -3,7 +3,7 @@ Anonymous Link https://anonymous.4open.science/r/2d1a895b-e5b6-43f4-8a66-f763c76
 
 ### Scene Graph Generation Part
 1. Download and unpack Visual Genome images as well as the annotations, class info and image meta-data
-2. Get initial scene graph with VCT 
+2. Get initial scene graph with [VCT](https://github.com/KaihuaTang/VCTree-Scene-Graph-Generation)
 3. Next, run train_graph.py to train the scene graph generation
 ```
 python train_graph.py --input_scene_dir <path/to/input/scene/dir> --output_scene_dir <path/to/output/scene/dir> 
@@ -16,7 +16,7 @@ python train_graph.py --input_scene_dir <path/to/input/scene/dir> --output_scene
 ```
 python preprocess_questions.py --glove_pt </path/to/generated/glove/pickle/file> --input_questions_json </your/path/to/v2_OpenEnded_mscoco_train2014_questions.json> --input_annotations_json </your/path/to/v2_mscoco_train2014_annotations.json> --output_pt </your/output/path/train_questions.pt> --vocab_json </your/output/path/vocab.json> --mode train
 ``` 
-3. Download grounded features from paper Bottom-Up and Top-Down Attention for Image Captioning and Visual Question Answering
+3. Download grounded features from paper Bottom-Up and Top-Down Attention for Image Captioning and Visual Question Answering [repo](https://github.com/peteanderson80/bottom-up-attention)
 4. Preprocess featurs
 ```
 python preprocess_features.py --input_tsv_folder /your/path/to/trainval_36/ --output_h5 /your/output/path/trainval_feature.h5
