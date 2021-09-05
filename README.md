@@ -1,5 +1,5 @@
 # NKM
-Anonymous Link https://anonymous.4open.science/r/2d1a895b-e5b6-43f4-8a66-f763c767d6ce/
+This is the code page for NKM work. Since we are currently working on a relevant project that share the same codebase, we do not release the code yet. The full code will be available soon.
 
 ### Scene Graph Generation Part
 1. Download and unpack Visual Genome images as well as the annotations, class info and image meta-data
